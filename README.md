@@ -1,200 +1,171 @@
-# 🏋️ Team2 Final — Healthcare Todo App
+Health Care — AI 기반 개인 맞춤형 운동·식단 관리 플랫폼
 
-AI 기반 **운동·식단·생활 루틴 관리 웹앱**
-Django + DRF + Postgres + Docker Compose 기반 프로젝트
+AI 식단 분석, 운동 관리, 식단 기록, 목표 관리를 한 플랫폼에서 제공하는 개인 맞춤형 헬스케어 서비스입니다. Django REST Framework, PostgreSQL, Redis, Docker Compose 기반으로 개발되었습니다.
 
----
+목차
 
-## 🚀 기능 요약
+프로젝트 개요
 
-- **Workout 관리**
-  - 주간 운동 플랜 생성/수정
-  - TaskItem(세트, 반복수, 강도, 완료여부) 저장
-  - Dashboard에서 오늘 운동 진척도 확인
+주요 기능
 
-- **식단 관리**
-  - 사진 업로드 → AI 자동 분석 (칼로리·영양소 추출)
-  - NutritionLog 집계 + DailyGoal 반영
+서비스 시연 영상
 
-- **Dashboard**
-  - 오늘의 운동/식단/목표 합계
-  - 진행도 Progress Ring 시각화
+아키텍처
 
-- **AI 인사이트**
-  - Hugging Face 이미지/텍스트 모델 연동
-  - 개인 맞춤 식단/운동 추천
+AI 분석 흐름
 
-- **기타**
-  - JWT 로그인 (SimpleJWT)
-  - 관리자 페이지(/admin/)
-  - OpenAPI 문서 (/docs, /redoc, /openapi.json)
-  - Prometheus 메트릭 지원 (옵션)
+Redis 성능 개선
 
----
+ERD
 
-# 🚀 Team2 Final — AWS 배포 종합 가이드
-(EC2 + Docker Compose + Gunicorn/Nginx + RDS + IAM/S3 + 모니터링 준비)
+실행 방법
 
-> 이 문서는 EC2, RDS(Postgres), Docker Compose, Gunicorn/Nginx, IAM Role, S3 연동을 기반으로 한 **운영 배포 절차 및 트러블슈팅 가이드**입니다.
-> 주요 명령어, 확인 포인트, 오류와 해결책을 포함합니다.
+배포 서버
 
----
+기술 스택
 
-## 0) 서버 접속 & 디렉토리
-```bash
-ssh -i ~/.ssh/team2-final-key.pem ubuntu@<EC2_PUBLIC_IP>
-cd ~/app/team_final-main
-1) EC2 관리
-상태 확인
-bash
-코드 복사
-uname -a
-top -b -n1 | head -20
-free -m
-df -h /
-메모리 여유: 150MB 이상 권장
+API 문서
 
-디스크 사용률: 80%↑ 시 Docker prune 필요
+License
 
-EC2 삭제(예시)
-bash
-코드 복사
-aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,State.Name,PublicIpAddress]' --output table
-aws ec2 terminate-instances --instance-ids <INSTANCE_ID>
-2) Docker Compose 운영
-bash
-코드 복사
-# 기동 및 빌드
-sudo docker compose up -d --build
+프로젝트 개요
 
-# 상태 확인
-docker compose ps
+Health Care는 운동(Task), 식단(Nutrition), AI 이미지 분석, Summary 대시보드, 목표 관리(Profile)를 통합 제공하는 헬스케어 서비스입니다. 모든 데이터는 하루 단위로 연결되며 Summary에 즉시 반영됩니다.
 
-# Nginx 테스트 & 재시작
-docker compose exec -T nginx nginx -t && docker compose restart nginx
+주요 기능
+운동 관리
 
-# 전체 재시작
-sudo docker compose down
-sudo docker compose up -d
+날짜 기반 Task 자동 생성
 
-# 용량 정리
-docker system prune -af
-docker volume prune -f
-3) Nginx ↔ Gunicorn 튜닝
-Nginx 주요 포인트
-upstream keepalive 적용
+완료/스킵 처리
 
-proxy timeout / next_upstream 설정
+Summary 자동 업데이트
 
-healthz/readyz는 GET 사용
+식단 관리
 
-bash
-코드 복사
-curl -s http://127.0.0.1/healthz
-curl -s http://127.0.0.1/readyz
-Gunicorn 옵션 (docker-compose.yml)
-yaml
-코드 복사
-GUNICORN_CMD_ARGS: >
-  --bind=0.0.0.0:8000
-  --workers=2
-  --threads=2
-  --timeout=60
-  --keep-alive=15
-4) 헬스체크 & 스모크 테스트
-bash
-코드 복사
-# 헬스 확인
-curl -s http://127.0.0.1/healthz
-curl -s http://127.0.0.1/readyz
+음식별 칼로리, 탄단지 누적 계산
 
-# API 스모크
-ACCESS=$(curl -s -X POST http://127.0.0.1/auth/token/ \
-  -H "Content-Type: application/json" \
-  -d '{"username":"<USER>","password":"<PASS>"}' \
-| python3 -c 'import sys,json;print(json.load(sys.stdin)["access"])')
+삭제 시 Summary 자동 반영
 
-DATE=$(date +%F)
+식약처 14,584건 영양 DB 기반
 
-curl -s -H "Authorization: Bearer $ACCESS" \
-  "http://127.0.0.1/api/workoutplans/summary/?date=$DATE"
-5) RDS(Postgres) 전환
-.env.prod 예시
-dotenv
-코드 복사
-DB_ENGINE=django.db.backends.postgresql
-DB_HOST=team2-final-db.c6l0a4weokiv.us-east-1.rds.amazonaws.com
-DB_PORT=5432
-POSTGRES_DB=team2final
-POSTGRES_USER=team2
-POSTGRES_PASSWORD=<SECRET>
-연결 확인
-bash
-코드 복사
-docker compose exec -T api bash -lc '
-python - <<PY
-import psycopg2, os
-print("Trying DB:", os.environ["DB_HOST"])
-conn = psycopg2.connect(
-  host=os.environ["DB_HOST"],
-  dbname=os.environ["POSTGRES_DB"],
-  user=os.environ["POSTGRES_USER"],
-  password=os.environ["POSTGRES_PASSWORD"],
-  connect_timeout=5
-)
-print("RDS OK:", conn.get_dsn_parameters())
-conn.close()
-PY
-'
-6) IAM Role & S3
-IAM Role 확인
-bash
-코드 복사
-curl -s http://169.254.169.254/latest/meta-data/iam/info
-aws sts get-caller-identity
-S3 업로드 확인
-bash
-코드 복사
-docker compose exec -T api bash -lc '
-python - <<PY
-import boto3
-bucket="team2-final-media-0118"
-key="test/healthcheck.txt"
-s3 = boto3.client("s3")
-s3.put_object(Bucket=bucket, Key=key, Body=b"ok")
-head = s3.head_object(Bucket=bucket, Key=key)
-print("S3 HEAD ok, size=", head["ContentLength"])
-PY
-'
-7) 자주 발생하는 문제 & 해결
-DJANGO_ALLOWED_HOSTS 경고
-→ .env.prod 에 DJANGO_ALLOWED_HOSTS / CSRF_TRUSTED_ORIGINS 추가
+AI 식단 분석
 
-Nginx connect()/recv() failed
-→ Gunicorn keep-alive/timeout 옵션 조정
+HuggingFace ViT 모델 기반 이미지 분석
 
-SSH 느림
-→ 재부팅 or Stop/Start, t3.small 업그레이드
+음식명·칼로리·탄단지 추정
 
-S3 404/AccessDenied
-→ IAM Role 권한 확인, 버킷명/리전 점검
+기존 식단 데이터와 자동 합산
 
-DB 연결 실패
-→ RDS 보안그룹 5432 확인, 환경변수 값 재검증
+(여기에 AI 분석 성공 이미지 삽입)
 
-8) 빠른 진단 번들
-bash
-코드 복사
-docker compose ps
-docker compose logs --since=3m api | tail -n 100
-docker compose logs --since=3m nginx | egrep -i "error|connect|recv" || true
-9) 체크리스트
- EC2 접속/리소스 확인
+사용자 관리
 
- Docker Compose 서비스 Healthy
+JWT 인증
 
- 헬스체크 200 OK
+카카오 로그인
 
- RDS 연결 OK
+네이버 로그인
 
- IAM Role + S3 업로드 OK
+프로필 수정
+
+모니터링
+
+Prometheus + Grafana + Alertmanager + Slack
+
+API 지연, 에러율, 프로브 상태, Redis 지표 모니터링
+
+서비스 시연 영상
+전체 시연 (1분 44초)
+
+로그인 → 운동 Task 생성 → Summary 업데이트 →
+AI 식단 분석 2회 → 영양소 누적 계산 → Nutrition 삭제 →
+프로필 수정 → 로그아웃
+전체 기능 흐름을 1분 44초로 확인할 수 있습니다.
+
+(여기에 전체 시연 영상 삽입)
+
+사용자 관리(로그인/소셜 로그인)
+
+카카오 로그인, 네이버 로그인, 로그아웃 흐름을 보여주는 영상입니다.
+
+(여기에 소셜 로그인 영상 삽입)
+
+아키텍처
+
+AWS EC2 단일 인스턴스에서 Docker Compose 기반으로 운영됩니다.
+
+Nginx → Gunicorn → Django API → PostgreSQL / Redis
+Prometheus / Grafana / Alertmanager / Blackbox 포함
+
+(여기에 아키텍처 다이어그램 삽입)
+
+AI 분석 흐름
+
+사용자가 음식 사진 업로드
+
+Django → HuggingFace 모델 호출
+
+음식명·칼로리·영양소 추정
+
+Nutrition에 누적 저장
+
+Summary와 Dashboard에 즉시 반영
+
+(여기에 AI 분석 흐름 이미지 삽입)
+
+Redis 성능 개선
+
+k6 + Grafana 실측 기준 Redis 전/후 성능 비교입니다.
+
+항목	Redis 이전	Redis 이후
+API p95	5~50초	1초 이하
+OK 비율	93~95%	100%
+총 처리량	1.6K	8K (+400%)
+오류	잦은 422	0건
+ai-chat 평균 응답	5.61초	0.63초
+
+(여기에 Grafana Before 이미지)
+(여기에 Grafana After 이미지)
+
+ERD
+
+운동, 식단, Summary, User 도메인이 하루 단위로 연결되는 구조입니다.
+
+(여기에 ERD 이미지 삽입)
+
+실행 방법
+
+git clone 후 env 설정, Docker 실행만 하면 바로 동작합니다.
+
+git clone https://github.com/원진레포지토리/healthcare.git
+
+cd healthcare
+cp .env.example .env
+docker compose up --build
+
+접속: http://localhost:8000
+
+배포 서버
+
+실 서버: http://3.231.64.141/
+
+테스트 계정: swj6824 / dnjswls12@
+
+기술 스택
+
+Backend: Django 5, DRF, PostgreSQL, Redis, HuggingFace ViT
+DevOps: Docker Compose, Nginx, Gunicorn, Prometheus, Grafana, Alertmanager
+Frontend: Django Templates, Vanilla JS
+
+API 문서
+
+API 상세 명세는 PDF로 제공합니다.
+
+(여기에 API 문서 PDF 링크 삽입)
+
+License
+
+© 2025 Health Care Project
+식약처 영양성분 데이터(14,584건) 사용
+출처: https://www.foodsafetykorea.go.kr/
