@@ -70,7 +70,7 @@ docker compose exec api python manage.py createsuperuser
 # 6) (선택) 데모 데이터 생성
 docker compose exec api python manage.py seed_demo --username <your_id> --days 60
 ```
- ### === 참고 사항 ===
+ ### 참고 사항 
 - 로컬 개발 시: USE_SQLITE=True 로 SQLite 사용
 - Redis 미사용 시 자동으로 Django 기본 메모리 캐시로 fallback
 - /healthz (Nginx), /probe/api-healthz (Django 실제상태)로 헬스 체크 가능
@@ -136,11 +136,8 @@ https://github.com/user-attachments/assets/542c463d-9bb9-4dd6-8ab2-0bb7a3920f60
 
 ## AI 분석 흐름 (AI Processing Pipeline)
 
-
 https://github.com/user-attachments/assets/394cea09-cb04-48b7-b070-3efbdbeea0cd
 
-
-<video src="docs/ai 시연.mp4" width="600" autoplay loop muted></video>
 1. **이미지 업로드**  
    사용자가 음식 사진을 업로드하면 Django REST API에서 파일을 수신합니다.
 
@@ -195,14 +192,14 @@ Redis 도입 후:
 
 ---
 
-배포 서버
-실 서버 주소: http://3.231.64.141/
-인프라: AWS EC2(Ubuntu) + Docker Compose + Nginx + Gunicorn + PostgreSQL(RDS) + Redis
+## 배포 서버
+- 실 서버 주소: http://3.231.64.141/
+- 인프라: AWS EC2(Ubuntu) + Docker Compose + Nginx + Gunicorn + PostgreSQL(RDS) + Redis
 
-기술 스택
-Backend: Django 5, Django REST Framework, PostgreSQL, Redis, HuggingFace ViT
-DevOps: Docker Compose, Nginx, Gunicorn, Prometheus, Grafana, Alertmanager, Blackbox Exporter
-Frontend: Django Templates, Vanilla JS
+## 기술 스택
+- Backend: Django 5, Django REST Framework, PostgreSQL, Redis, HuggingFace ViT
+- DevOps: Docker Compose, Nginx, Gunicorn, Prometheus, Grafana, Alertmanager, Blackbox Exporter
+- Frontend: Django Templates, Vanilla JS
 
 API 문서
 API 상세 명세는 docs/api.md로 제공합니다. (GitHub에서 docs/api.md 파일을 생성 후, 구글 시트/문서에서 정리한 내용을 붙여넣으면 됩니다.)
