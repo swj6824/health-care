@@ -70,11 +70,11 @@ docker compose exec api python manage.py createsuperuser
 # 6) (선택) 데모 데이터 생성
 docker compose exec api python manage.py seed_demo --username <your_id> --days 60
 ```
-# === 참고 사항 ===
-# - 로컬 개발 시: USE_SQLITE=True 로 SQLite 사용
-# - Redis 미사용 시 자동으로 Django 기본 메모리 캐시로 fallback
-# - /healthz (Nginx), /probe/api-healthz (Django 실제상태)로 헬스 체크 가능
-# - 정적 파일은 Docker 환경에서 자동 수집됨
+ ###=== 참고 사항 ===
+- 로컬 개발 시: USE_SQLITE=True 로 SQLite 사용
+- Redis 미사용 시 자동으로 Django 기본 메모리 캐시로 fallback
+- /healthz (Nginx), /probe/api-healthz (Django 실제상태)로 헬스 체크 가능
+- 정적 파일은 Docker 환경에서 자동 수집됨
 ---
 ---
 ## 서비스 시연 영상
