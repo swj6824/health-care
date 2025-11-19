@@ -135,8 +135,11 @@ AI 식단 분석(2회) → 영양소 누적 계산 → Nutrition 삭제 →
 
 ## AI 분석 흐름 (AI Processing Pipeline)
 
+
+https://github.com/user-attachments/assets/394cea09-cb04-48b7-b070-3efbdbeea0cd
+
+
 <video src="docs/ai 시연.mp4" width="600" autoplay loop muted></video>
-![Uploading ai 시연.gif…]()
 1. **이미지 업로드**  
    사용자가 음식 사진을 업로드하면 Django REST API에서 파일을 수신합니다.
 
