@@ -43,3 +43,4 @@ media_backup_*.*
 
 # Node (if frontend uses npm/yarn)
 node_modules/
+grafana-data/grafana.db
