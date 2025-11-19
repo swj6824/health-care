@@ -131,7 +131,7 @@ https://github.com/user-attachments/assets/8d680eee-a7fa-4b17-b2c5-a8e335d0196c
 - 백엔드: Django SessionAuth + JWT Dual Flow
 - 소셜 로그인: Kakao/Naver OAuth → JWT 자동 발급
 
-<video src="docs/로그인%20인증%20구.mov" width="640" controls muted></video>
+https://github.com/user-attachments/assets/542c463d-9bb9-4dd6-8ab2-0bb7a3920f60
 
 ---
 
