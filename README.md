@@ -89,7 +89,7 @@ AI 식단 분석(2회) → 영양소 누적 계산 → Nutrition 삭제 →
 ---
 ## 아키텍처
 ### Architecture Diagram
-![시스템 아키텍처](https://raw.githubusercontent.com/swj6824/health-care/main/docs/시스템%20아키텍쳐.png)
+<img width="733" height="398" alt="시스템 아키텍쳐" src="https://github.com/user-attachments/assets/6e3713ab-5c3f-44e3-8a3a-a6f1373ffdb9" />
 
 - 요청 경로: 클라이언트(웹 브라우저) → Nginx Reverse Proxy → Django REST API(DRF) → PostgreSQL(RDS) / Redis / HuggingFace AI → 단일 JSON 응답 반환.
 
@@ -136,7 +136,7 @@ AI 식단 분석(2회) → 영양소 누적 계산 → Nutrition 삭제 →
 ## AI 분석 흐름 (AI Processing Pipeline)
 
 <video src="docs/ai 시연.mp4" width="600" autoplay loop muted></video>
-
+![Uploading ai 시연.gif…]()
 1. **이미지 업로드**  
    사용자가 음식 사진을 업로드하면 Django REST API에서 파일을 수신합니다.
 
@@ -172,13 +172,14 @@ Redis 도입 전:
 - 특정 구간에서 ai-meal-analyze view의 p95 지연 시간이 급등
 - HTTP 상태 코드별 그래프에서 4xx/5xx 비율이 눈에 띄게 증가하는 구간 존재
 - 누적 RPS 그래프가 일정 시점 이후 평탄해지면서 처리 한계에 근접하는 패턴
-![Redis 도입 전 모니터링](docs/레디스 전.png)
+<img width="1138" height="580" alt="레디스 전" src="https://github.com/user-attachments/assets/0bbe6935-3983-4247-8c72-a7196455a6b3" />
+
 
 Redis 도입 후:
 - 동일 부하에서 ai-meal-analyze p95 지연 시간이 짧고 안정적으로 유지
 - Error Rate 패널에서 비정상 응답이 거의 관측되지 않음
 - RPS 게이지와 그래프가 더 높은 수준에서 안정적인 throughput 유지
-![Redis 도입 후](docs/레디스 후.png)
+<img width="1437" height="739" alt="레디스 후" src="https://github.com/user-attachments/assets/0e0ee7e9-d02d-456a-822b-0ed7f7e7dba7" />
 
 | 항목 | Redis 이전 | Redis 이후 |
 |------|------------|------------|
