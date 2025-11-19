@@ -84,7 +84,6 @@ docker compose exec api python manage.py seed_demo --username <your_id> --days 6
 AI 식단 분석(2회) → 영양소 누적 계산 →   
 프로필 수정 → 로그아웃  
 전체 기능 흐름을 52초에 담았습니다.
-👉 [시연영상.mp4 바로보기](docs/시연영상.mp4)
 
 https://github.com/user-attachments/assets/8d680eee-a7fa-4b17-b2c5-a8e335d0196c
 
