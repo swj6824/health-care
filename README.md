@@ -22,12 +22,13 @@ AI 식단 분석, 운동 관리, 식단 기록, Summary, 목표 관리 기능을
 ## 프로젝트 개요
 
 - 프로젝트 명: Health Care
-- 팀 구성:
-| 이름 | 역할 | 담당 영역 |
-|------|------|-----------|
-| **신원진** | Backend Developer (Lead) | - 오늘 플랜 자동 생성(ensure_today) <br> - Task 완료 토글(멱등 처리) <br> - Nutrition 집계 및 Summary 계산 로직 설계 <br> - 핵심 API 대부분 구현(users, tasks, nutrition, goals) <br> - N+1 최적화(select_related/prefetch_related) <br> - Redis 캐싱 도입 및 성능 개선(p95 latency/RPS 개선) <br> - /healthz /readyz 헬스체크, 통합 예외 처리 <br> - Demo Seed 스크립트 구축 <br> - 전체 백엔드 구조 및 배포 운영 |
-| **김수연** |  디자인 / Backend Support | - 프로젝트 일정 및 구조 논의 참여  <br> - Figma 디자인 초안 작성 <br> - Feedbacks / Goals 일부 모델 초안 설계 |
-| **이종현** | PM / Model 초안 설계 | -  초기 ERD 초안 작업 일부 기여 <br> - User 모델 초안 설계 <br> - OAuth 적용 참고자료 조사 |
+팀 구성:
+
+  | 이름   | 역할                         | 담당 영역 |
+  |--------|------------------------------|-----------|
+  | 신원진 | Backend Developer (Lead)     | 오늘 플랜 자동 생성(ensure_today)<br>Task 완료 토글(멱등 처리)<br>Nutrition 집계 및 Summary 계산 로직 설계<br>주요 API(users, tasks, nutrition, goals) 구현<br>N+1 최적화(select_related/prefetch_related)<br>Redis 캐싱 도입 및 성능 개선(p95 latency/RPS)<br>/healthz, /readyz 헬스체크 및 예외 처리<br>Demo Seed 스크립트 및 전체 백엔드 구조/배포 운영 |
+  | 김수연 | 디자인 / Backend Support     | 프로젝트 일정 및 구조 논의 참여<br>Figma 디자인 초안 작성<br>Feedbacks / Goals 일부 모델 초안 설계 |
+  | 이종현 | PM / Model 초안 설계         | 초기 ERD 초안 작업 일부 기여<br>User 모델 초안 설계<br>OAuth 적용 참고자료 조사 |
 - 프로젝트 설명:
 Health Care는 하루 단위의 운동(Task) · 식단(Nutrition) · AI 이미지 분석 · Summary 대시보드 · 목표 관리(Profile)
 전 과정을 자동으로 연결해주는 AI 기반 개인 건강관리 플랫폼입니다.
@@ -192,9 +193,11 @@ Redis 도입 후:
 
 ---
 
-## 배포 서버
+## 배포 서버(현재 HTTP 기반, 도메인 연동 후 HTTPS 전환 예정)
 - 실 서버 주소: http://3.231.64.141/
 - 인프라: AWS EC2(Ubuntu) + Docker Compose + Nginx + Gunicorn + PostgreSQL(RDS) + Redis
+- 현재는 도메인 미보유 상태로 인해 HTTP로 운영 중이며,서비스 구조는 HTTPS 전환(Nginx SSL Termination)에 이미 대응되고 있습니다.
+추후 도메인 연동 후 SSL 인증서를 적용하여 HTTPS로 확장할 예정입니다.
 
 ## 기술 스택
 - Backend: Django 5, Django REST Framework, PostgreSQL, Redis, HuggingFace ViT
